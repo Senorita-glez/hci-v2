@@ -11,7 +11,7 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import Button from "../components/button"; // Asegúrate de que tengas un componente Button en la ruta correcta
 
-function Pantalla1() {
+function Pantalla1({ navigation }) { // Recibir 'navigation' aquí
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [mediaLibraryPermissionResponse, requestMediaLibraryPermission] =
     MediaLibrary.usePermissions();
@@ -88,7 +88,7 @@ function Pantalla1() {
   };
 
   // Función para guardar la imagen usando MediaLibrary
-  const savePicture = async (navigation) => {
+  const savePicture = async () => { // No es necesario pasar 'navigation' aquí
     if (image) {
       try {
         // Guardar la imagen en la galería
@@ -199,7 +199,7 @@ function Pantalla1() {
             <Button icon="flip-camera-android" onPress={() => setImage(null)} />
             <Button
               icon="check"
-              onPress={() => savePicture(navigation)} // Pasamos el objeto de navegación
+              onPress={savePicture} // Llamar directamente a savePicture sin pasar navigation aquí
             />
           </View>
         </>
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   bottomControlsContainer: {
-    height: "30% ",
+    height: "30%", // Aquí estaba el error, quita el espacio extra
     backgroundColor: "black",
     flexDirection: "row",
     justifyContent: "space-around",
