@@ -10,7 +10,7 @@ const PantallaAcciones = ({ route, navigation }) => {
             <Text style={styles.title}>Foto Guardada</Text>
             <Image source={{ uri: savedImage }} style={styles.savedImage} />
             <Button title="Hacer otra acción" onPress={() => alert('Acción realizada!')} />
-            <Button title="Volver al inicio" onPress={() => navigation.navigate('Pantalla1')} />
+            <Button title="Volver al inicio" onPress={() => navigation.navigate('Home')} />
         </View>
     );
 };
