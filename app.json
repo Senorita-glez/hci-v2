@@ -8,7 +8,8 @@
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
           "recordAudioAndroid": true
         }
-      ]
+      ],
+      "expo-video"
     ],
     "name": "hci-v2",
     "slug": "hci-v2",

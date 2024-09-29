@@ -1,126 +1,78 @@
-import { Camera, CameraView, useCameraPermissions } from "expo-camera";
-import { CameraType, FlashMode } from "expo-camera/legacy";
-import { useState } from "react";
-import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+// App.js
+import * as React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-export default function CameraComp() {
-  const [type, setType] = useState(CameraType.back);
-  const [permission, requestPermission] = useCameraPermissions();
-  const [flash, setFlash] = useState(FlashMode.off);
+// Importa las pantallas desde archivos separados
+import Pantalla1 from './screens/camera';
+import Pantalla2 from './screens/gallery';
 
-  if (!permission) {
-    // Camera permissions are still loading.
-    return <View />;
-  }
-
-  if (!permission.granted) {
-    // Camera permissions are not granted yet.
-    return (
-      <View style={styles.container}>
-        <Text style={styles.message}>
-          We need your permission to show the camera
-        </Text>
-        <Button onPress={requestPermission} title="grant permission" />
-      </View>
-    );
-  }
-
-  function toggleCameraFacing() {
-    setType((current) => (current === "back" ? "front" : "back"));
-  }
-
+// Pantalla Home con los botones estilizados
+function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <View style={styles.containerCamera}>
-      <CameraView style={styles.camera} facing={type}>
-        <View style={styles.buttonContainer}>
-          {/* Botón de capturar */}
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>📸</Text>
-          </TouchableOpacity>
-          {/* Botón de flip camera */}
-          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <Text style={styles.buttonText}>🔄</Text>
-          </TouchableOpacity>
-
-          {/* Botón de modo nocturno */}
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>🌙</Text>
-          </TouchableOpacity>
-
-          {/* Botón de HDR */}
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>HDR</Text>
-          </TouchableOpacity>
-
-          {/* Botón de configuración */}
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>⚙️</Text>
-          </TouchableOpacity>
-        </View>
-        
-      </CameraView>
-      </View>
-      <View style={styles.captureButtonContainer}>
-          <TouchableOpacity style={styles.captureButton}>
-            <View style={styles.innerCircle} />
-          </TouchableOpacity>
-        </View>
+      <Text style={styles.title}>Pantalla de Inicio</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('Pantalla1')}
+      >
+        <Text style={styles.buttonText}>Ir a Pantalla 1</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('Pantalla2')}
+      >
+        <Text style={styles.buttonText}>Ir a Pantalla 2</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
+const Stack = createStackNavigator();
+
+function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen 
+          name="Home" 
+          component={HomeScreen} 
+          options={{ headerShown: false }} // Oculta la barra de título en la pantalla de inicio
+        />
+        <Stack.Screen name="Pantalla1" component={Pantalla1} />
+        <Stack.Screen name="Pantalla2" component={Pantalla2} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+export default App;
+
+// Estilos personalizados
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "relative",
-    backgroundColor: '#25292e',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
   },
-  camera: {
-    flex: 1,
-  },
-  buttonContainer: {
-    position: "absolute",
-    right: 20,
-    top: "5%",
-    justifyContent: "space-between",
-    height: "50%",
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 40,
+    color: '#333',
   },
   button: {
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    padding: 20,
-    alignItems: "center",
-    marginBottom: 15,
+    backgroundColor: '#6200ea',
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 10,
+    marginVertical: 10,
   },
   buttonText: {
-    fontSize: 15,
-  },
-  captureButtonContainer: {
-    position: "absolute",
-    bottom: "10%",
-    left: "50%",
-    marginLeft: -50, // Para centrar horizontalmente
-  },
-  captureButton: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  innerCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: "white",
-  },
-  containerCamera: {
-    flex: 1,
-    marginTop:"25%", 
-    marginBottom:"50%",
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
