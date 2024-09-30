@@ -11,7 +11,7 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import Button from "../components/button"; // Asegúrate de que tengas un componente Button en la ruta correcta
 
-function Pantalla1({ navigation }) { // Recibir 'navigation' aquí
+function Pantalla1({ navigation }) {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [mediaLibraryPermissionResponse, requestMediaLibraryPermission] =
     MediaLibrary.usePermissions();
@@ -27,7 +27,6 @@ function Pantalla1({ navigation }) { // Recibir 'navigation' aquí
 
   const cameraRef = useRef(null);
 
-  // Cargar la última imagen guardada cuando cambian los permisos
   useEffect(() => {
     if (
       cameraPermission &&
@@ -40,7 +39,6 @@ function Pantalla1({ navigation }) { // Recibir 'navigation' aquí
   }, [cameraPermission, mediaLibraryPermissionResponse]);
 
   if (!cameraPermission || !mediaLibraryPermissionResponse) {
-    // Si los permisos están cargando.
     return <View />;
   }
 
@@ -48,7 +46,6 @@ function Pantalla1({ navigation }) { // Recibir 'navigation' aquí
     !cameraPermission.granted ||
     mediaLibraryPermissionResponse.status !== "granted"
   ) {
-    // Si los permisos no han sido concedidos.
     return (
       <View style={styles.container}>
         <Text>
@@ -67,7 +64,6 @@ function Pantalla1({ navigation }) { // Recibir 'navigation' aquí
     );
   }
 
-  // Función para alternar las propiedades de la cámara
   const toggleProperty = (prop, option1, option2) => {
     setCameraProps((current) => ({
       ...current,
@@ -75,7 +71,6 @@ function Pantalla1({ navigation }) { // Recibir 'navigation' aquí
     }));
   };
 
-  // Función para tomar una foto y mostrarla sin guardarla
   const takePicture = async () => {
     if (cameraRef.current) {
       try {
@@ -87,24 +82,16 @@ function Pantalla1({ navigation }) { // Recibir 'navigation' aquí
     }
   };
 
-  // Función para guardar la imagen usando MediaLibrary
-  const savePicture = async () => { // No es necesario pasar 'navigation' aquí
+  const savePicture = async () => {
     if (image) {
       try {
-        // Guardar la imagen en la galería
         const asset = await MediaLibrary.createAssetAsync(image);
         const assetInfo = await MediaLibrary.getAssetInfoAsync(asset.id);
-
-        // Alerta confirmando que la foto fue guardada (opcional)
         Alert.alert(
           "¡Foto guardada!",
           "La imagen ha sido guardada correctamente."
         );
-
-        // Limpiar la imagen actual
         setImage(null);
-
-        // Navegar a la pantalla de acciones con la URI de la imagen guardada
         navigation.navigate("PantallaAcciones", { savedImage: assetInfo.uri });
       } catch (err) {
         console.log("Error al guardar la foto:", err);
@@ -112,14 +99,12 @@ function Pantalla1({ navigation }) { // Recibir 'navigation' aquí
     }
   };
 
-  // Función para obtener la última imagen guardada del álbum "DCIM"
   const getLastSavedImage = async () => {
     if (
       mediaLibraryPermissionResponse &&
       mediaLibraryPermissionResponse.status === "granted"
     ) {
       const dcimAlbum = await MediaLibrary.getAlbumAsync("DCIM");
-
       if (dcimAlbum) {
         const { assets } = await MediaLibrary.getAssetsAsync({
           album: dcimAlbum,
@@ -144,21 +129,20 @@ function Pantalla1({ navigation }) { // Recibir 'navigation' aquí
     <View style={styles.container}>
       {!image ? (
         <>
+        <View style={styles.space}></View>
           <View style={styles.topControlsContainer}>
+            {/* Botón para volver a la pantalla de inicio */}
+            
             <Button
-              icon={cameraProps.flash === "on" ? "flash-on" : "flash-off"}
-              onPress={() => toggleProperty("flash", "on", "off")}
+              icon="arrow-back" // Icono de flecha a la izquierda
+              onPress={() => navigation.goBack()} // Función de navegación para volver
+              style={styles.backButton} // Estilos para la esquina superior izquierda
             />
+            {/* Botón de flash en la esquina superior derecha */}
             <Button
-              icon="animation"
-              color={cameraProps.animateShutter ? "white" : "#404040"}
-              onPress={() => toggleProperty("animateShutter", true, false)}
-            />
-            <Button
-              icon={
-                cameraProps.enableTorch ? "flashlight-on" : "flashlight-off"
-              }
+              icon={cameraProps.enableTorch ? "flash-on" : "flash-off"} // Cambiamos el icono mostrado
               onPress={() => toggleProperty("enableTorch", true, false)}
+              style={styles.flashButton} // Mantiene la función de la linterna
             />
           </View>
           <CameraView
@@ -197,10 +181,7 @@ function Pantalla1({ navigation }) { // Recibir 'navigation' aquí
           <Image source={{ uri: image }} style={styles.camera} />
           <View style={styles.bottomControlsContainer}>
             <Button icon="flip-camera-android" onPress={() => setImage(null)} />
-            <Button
-              icon="check"
-              onPress={savePicture} // Llamar directamente a savePicture sin pasar navigation aquí
-            />
+            <Button icon="check" onPress={savePicture} />
           </View>
         </>
       )}
@@ -213,15 +194,30 @@ export default Pantalla1;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#1c1c1c",
     marginTop: 0,
   },
   topControlsContainer: {
-    height: 60,
-    backgroundColor: "black",
+    height: '10%',
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between", // Para que los botones estén en las esquinas
     alignItems: "center",
+    backgroundColor: "#1c1c1c",
+  },
+  space: {
+    backgroundColor: "#1c1c1c",
+    width:6,
+    height: '5%',
+  },
+  backButton: {
+    position: "absolute",
+    marginTop: 20, // Ajustar margen superior para el botón de volver
+    left: 10, // Colocar en la esquina superior izquierda
+  },
+  flashButton: {
+    position: "absolute",
+    marginTop: 20, // Ajustar margen superior para el botón de flash
+    right: 10, // Colocar en la esquina superior derecha
   },
   button: {
     backgroundColor: "blue",
@@ -237,23 +233,13 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
   },
-  slider: {
-    flex: 1,
-    marginHorizontal: 10,
-  },
-  sliderContainer: {
-    position: "absolute",
-    bottom: 120,
-    left: 20,
-    right: 20,
-    flexDirection: "row",
-  },
   bottomControlsContainer: {
-    height: "30%", // Aquí estaba el error, quita el espacio extra
-    backgroundColor: "black",
+    height: "30%",
+    backgroundColor: "#1c1c1c",
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
+    paddingBottom: 50,
   },
   previousImage: {
     width: 60,
