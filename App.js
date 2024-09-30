@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { ThemedButton } from 'react-native-really-awesome-button';
+
 // Importa las pantallas desde archivos separados
 import Pantalla1 from './screens/camera'; // Pantalla de cámara
 import Pantalla2 from './screens/gallery'; // Pantalla de galería
@@ -16,15 +17,35 @@ function HomeScreen({ navigation }) {
       <Text style={styles.subtitle}>comienza a crear...</Text>
       {/* Botón para ir a la pantalla de cámara */}
       <ThemedButton
-        name="rick" type="primary" activityColor='#349890' height={130} width={300} style={styles.bttn} raiseLevel={17} borderWidth={5} borderColor='#349890' backgroundDarker ='#67cbc3' backgroundColor='#fafafa'
+        name="rick"
+        type="primary"
+        activityColor='#349890'
+        height={130}
+        width={300}
+        style={styles.bttn}
+        raiseLevel={17}
+        borderWidth={5}
+        borderColor='#349890'
+        backgroundDarker ='#67cbc3'
+        backgroundColor='#fafafa'
         onPress={() => navigation.navigate('Pantalla1')}
       >
         <Text style={styles.buttonText}>Cámara</Text>
       </ThemedButton>
-      
+
       {/* Botón para ir a la pantalla de galería */}
       <ThemedButton
-        name="rick" type="primary" activityColor='#349890' height={130} width={300} style={styles.bttn} raiseLevel={17} borderWidth={5} borderColor='#349890' backgroundDarker ='#67cbc3' backgroundColor='#fafafa'
+        name="rick"
+        type="primary"
+        activityColor='#349890'
+        height={130}
+        width={300}
+        style={styles.bttn}
+        raiseLevel={17}
+        borderWidth={5}
+        borderColor='#349890'
+        backgroundDarker ='#67cbc3'
+        backgroundColor='#fafafa'
         onPress={() => navigation.navigate('Pantalla2')}
       >
         <Text style={styles.buttonText}>Galería</Text>
@@ -56,7 +77,13 @@ function App() {
         <Stack.Screen 
           name="Pantalla2" 
           component={Pantalla2} 
-          options={{ title: 'Galería' }} // Título en la barra superior para Pantalla2
+          options={{
+            title: 'Galería',
+            headerTintColor: '#fafafa',  // Cambia el color del título de la barra superior
+            headerStyle: {
+              backgroundColor: '#1c1c1c', // Color de fondo de la barra de navegación
+            },
+          }} 
         />
         {/* Pantalla de Acciones después de guardar la foto */}
         <Stack.Screen 
@@ -77,40 +104,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1c1c1c', // Fondo blanco para un look minimalista
+    backgroundColor: '#1c1c1c',
   },
   subtitle: {
-    fontSize: 25, // Tamaño más grande para el título
-    fontWeight: '600', // Peso mediano para una tipografía moderna
+    fontSize: 25,
+    fontWeight: '600',
     marginBottom: 70,
-    color: '#969696', // Texto gris oscuro para mayor suavidad
-    fontFamily: '',
+    color: '#969696',
   },
   title: {
-    fontSize: 33, // Tamaño más grande para el título
-    fontWeight: '600', // Peso mediano para una tipografía moderna
+    fontSize: 33,
+    fontWeight: '600',
     marginBottom: 4,
-    color: '#969696', // Texto gris oscuro para mayor suavidad
+    color: '#969696',
   },
   bttn: {
     marginBottom: 40,
   },
-  button: {
-    marginVertical: 10, // Color de fondo del botón
-    shadowColor: '#000', // Sombra sutil para botones
-
-    shadowOffset: { width: 20, height: 40 },
-    shadowOpacity: 0.1,
-    shadowRadius: 50,
-  },
   buttonText: {
-    color: '#349890', // Color de texto gris oscuro
+    color: '#349890',
     fontSize: 19,
-    fontWeight: '900', // Peso de texto moderado
-    textTransform: 'uppercase', // Texto en mayúsculas para un estilo moderno
+    fontWeight: '900',
+    textTransform: 'uppercase',
     marginTop: 10,
     marginBottom: 10,
-
   },
 });
-

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { MaterialIcons } from '@expo/vector-icons'; 
 import {
   StyleSheet,
   Text,
@@ -92,7 +93,8 @@ function Pantalla1({ navigation }) {
           "La imagen ha sido guardada correctamente."
         );
         setImage(null);
-        navigation.navigate("PantallaAcciones", { savedImage: assetInfo.uri });
+        // Cambiar de 'savedImage' a 'selectedImage' para unificar el parámetro en PantallaAcciones
+        navigation.navigate("PantallaAcciones", { selectedImage: assetInfo.uri });
       } catch (err) {
         console.log("Error al guardar la foto:", err);
       }
@@ -129,20 +131,20 @@ function Pantalla1({ navigation }) {
     <View style={styles.container}>
       {!image ? (
         <>
-        <View style={styles.space}></View>
+          <View style={styles.space}></View>
           <View style={styles.topControlsContainer}>
             {/* Botón para volver a la pantalla de inicio */}
-            
+
             <Button
-              icon="arrow-back" // Icono de flecha a la izquierda
-              onPress={() => navigation.goBack()} // Función de navegación para volver
-              style={styles.backButton} // Estilos para la esquina superior izquierda
+              icon="arrow-back"
+              onPress={() => navigation.goBack()}
+              style={styles.backButton}
             />
             {/* Botón de flash en la esquina superior derecha */}
             <Button
-              icon={cameraProps.enableTorch ? "flash-on" : "flash-off"} // Cambiamos el icono mostrado
+              icon={cameraProps.enableTorch ? "flash-on" : "flash-off"}
               onPress={() => toggleProperty("enableTorch", true, false)}
-              style={styles.flashButton} // Mantiene la función de la linterna
+              style={styles.flashButton}
             />
           </View>
           <CameraView
@@ -163,12 +165,15 @@ function Pantalla1({ navigation }) {
                 style={styles.previousImage}
               />
             </TouchableOpacity>
-            <Button
-              icon="camera"
-              size={60}
-              style={{ height: 60 }}
+
+            {/* Botón de captura de foto al estilo iPhone */}
+            <TouchableOpacity
               onPress={takePicture}
-            />
+              style={styles.captureButton}
+            >
+              <View style={styles.innerCaptureButton} />
+            </TouchableOpacity>
+
             <Button
               icon="flip-camera-ios"
               onPress={() => toggleProperty("facing", "front", "back")}
@@ -178,10 +183,23 @@ function Pantalla1({ navigation }) {
         </>
       ) : (
         <>
+          <View style={styles.maybeee}></View>
           <Image source={{ uri: image }} style={styles.camera} />
           <View style={styles.bottomControlsContainer}>
-            <Button icon="flip-camera-android" onPress={() => setImage(null)} />
-            <Button icon="check" onPress={savePicture} />
+            <TouchableOpacity
+              onPress={() => setImage(null)}
+              style={styles.btnico}
+            >
+              <MaterialIcons
+                name="flip-camera-android"
+                size={50}
+                color="#fff"
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={savePicture} style={styles.btnico}>
+              <MaterialIcons name="check" size={50} color="#fff" />
+            </TouchableOpacity>
           </View>
         </>
       )}
@@ -198,26 +216,26 @@ const styles = StyleSheet.create({
     marginTop: 0,
   },
   topControlsContainer: {
-    height: '10%',
+    height: "10%",
     flexDirection: "row",
-    justifyContent: "space-between", // Para que los botones estén en las esquinas
+    justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#1c1c1c",
   },
   space: {
     backgroundColor: "#1c1c1c",
-    width:6,
-    height: '5%',
+    width: 6,
+    height: "5%",
   },
   backButton: {
     position: "absolute",
-    marginTop: 20, // Ajustar margen superior para el botón de volver
-    left: 10, // Colocar en la esquina superior izquierda
+    marginTop: 20,
+    left: 10,
   },
   flashButton: {
     position: "absolute",
-    marginTop: 20, // Ajustar margen superior para el botón de flash
-    right: 10, // Colocar en la esquina superior derecha
+    marginTop: 20,
+    right: 10,
   },
   button: {
     backgroundColor: "blue",
@@ -245,5 +263,32 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 50,
+  },
+  // Estilo del botón de captura similar al iPhone
+  captureButton: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#fff", // Botón blanco
+    justifyContent: "center",
+    alignItems: "center",
+    borderColor: "#5B5B5B",
+    borderWidth: 30, // Borde grueso para dar apariencia de botón iPhone
+  },
+  innerCaptureButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#fff", // Círculo interior blanco
+  },
+  maybeee: {
+    backgroundColor: "#1c1c1c",
+    width: 6,
+    height: "13%",
+  },
+  btnico: {
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
