@@ -86,20 +86,32 @@ function Pantalla1({ navigation }) {
   const savePicture = async () => {
     if (image) {
       try {
+        // Verificar si los permisos están concedidos antes de guardar la imagen
+        const { status } = await MediaLibrary.getPermissionsAsync();
+        if (status !== 'granted') {
+          console.log("Permisos de la galería no concedidos.");
+          Alert.alert("Error", "Necesitas conceder permisos para guardar la imagen.");
+          return;
+        }
+  
         const asset = await MediaLibrary.createAssetAsync(image);
-        const assetInfo = await MediaLibrary.getAssetInfoAsync(asset.id);
-        Alert.alert(
-          "¡Foto guardada!",
-          "La imagen ha sido guardada correctamente."
-        );
-        setImage(null);
-        // Cambiar de 'savedImage' a 'selectedImage' para unificar el parámetro en PantallaAcciones
-        navigation.navigate("PantallaAcciones", { selectedImage: assetInfo.uri });
+        if (asset) {
+          const assetInfo = await MediaLibrary.getAssetInfoAsync(asset.id);
+          Alert.alert(
+            "¡Foto guardada!",
+            "La imagen ha sido guardada correctamente."
+          );
+          setImage(null);
+          navigation.navigate("PantallaAcciones", { selectedImage: assetInfo.uri });
+        } else {
+          console.log("Error: el asset es nulo.");
+        }
       } catch (err) {
         console.log("Error al guardar la foto:", err);
       }
     }
   };
+  
 
   const getLastSavedImage = async () => {
     if (
