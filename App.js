@@ -8,7 +8,7 @@ import { ThemedButton } from 'react-native-really-awesome-button';
 import Pantalla1 from './screens/camera'; // Pantalla de cámara
 import Pantalla2 from './screens/gallery'; // Pantalla de galería
 import PantallaAcciones from './screens/savedphoto'; // Pantalla de acciones con la foto guardada
-
+import PantallaQuitarFondo from './screens/result';
 // Pantalla Home con los botones estilizados
 function HomeScreen({ navigation }) {
   return (
@@ -91,7 +91,13 @@ function App() {
           component={PantallaAcciones} 
           options={{ headerShown: false }} // Título en la barra superior para PantallaAcciones
         />
+              <Stack.Screen 
+  name="PantallaQuitarFondo" 
+  component={PantallaQuitarFondo} 
+  options={{headerShown: false  }} 
+/>
       </Stack.Navigator>
+
     </NavigationContainer>
   );
 }

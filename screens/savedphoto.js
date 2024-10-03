@@ -1,6 +1,6 @@
 // screens/PantallaAcciones.js
 import React from 'react';
-import { View, Image, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { ThemedButton } from 'react-native-really-awesome-button';
 
 const PantallaAcciones = ({ route, navigation }) => {
@@ -10,6 +10,8 @@ const PantallaAcciones = ({ route, navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Foto Guardada</Text>
       <Image source={{ uri: selectedImage }} style={styles.savedImage} />
+      
+      {/* Botón para quitar el fondo y navegar a la pantalla de quitar fondo */}
       <ThemedButton
         name="rick"
         type="primary"
@@ -22,7 +24,7 @@ const PantallaAcciones = ({ route, navigation }) => {
         borderColor='#349890'
         backgroundDarker='#67cbc3'
         backgroundColor='#1c1c1c'
-        onPress={() => Alert.alert('Acción realizada!', 'Quitar fondo aplicado.')}
+        onPress={() => navigation.navigate('PantallaQuitarFondo', { selectedImage })}
       >
         <Text style={styles.buttonText}>Quitar fondo</Text>
       </ThemedButton>

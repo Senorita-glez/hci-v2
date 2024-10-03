@@ -24,7 +24,7 @@ const Pantalla2 = ({ navigation }) => {
     const media = await MediaLibrary.getAssetsAsync({
       album,
       mediaType: 'photo',
-      first: 50, // Cargar las primeras 50 imágenes
+      first: 100, // Cargar las primeras 50 imágenes
     });
     setPhotos(media.assets); // Guardar las fotos en el estado
   };
