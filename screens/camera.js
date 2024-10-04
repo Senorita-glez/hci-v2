@@ -12,6 +12,8 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import Button from "../components/button"; // Asegúrate de que tengas un componente Button en la ruta correcta
 
+import Pantalla2 from "./gallery";
+
 function Pantalla1({ navigation }) {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [mediaLibraryPermissionResponse, requestMediaLibraryPermission] =
@@ -170,7 +172,9 @@ function Pantalla1({ navigation }) {
           />
           <View style={styles.bottomControlsContainer}>
             <TouchableOpacity
-              onPress={() => previousImage && setImage(previousImage)}
+              onPress={() => {
+                navigation.navigate('Pantalla2');
+              }}
             >
               <Image
                 source={{ uri: previousImage }}
@@ -264,12 +268,12 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   bottomControlsContainer: {
-    height: "30%",
+    height: "26%",
     backgroundColor: "#1c1c1c",
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    paddingBottom: 50,
+    paddingBottom: 0,
   },
   previousImage: {
     width: 60,
