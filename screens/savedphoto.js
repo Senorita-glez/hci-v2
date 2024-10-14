@@ -5,7 +5,7 @@ import { ThemedButton } from 'react-native-really-awesome-button';
 import * as FileSystem from 'expo-file-system';
 
 const API_URL_HUGGINGFACE = "https://api-inference.huggingface.co/models/google/vit-base-patch16-224";
-const HUGGINGFACE_TOKEN = "Bearer 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";
+const HUGGINGFACE_TOKEN = "Bearer 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";
 const API_GRADIO_URL = "finegrain/finegrain-object-cutter";
 
 const PantallaAcciones = ({ route, navigation }) => {
