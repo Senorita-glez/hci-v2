@@ -58,7 +58,7 @@ const PantallaAcciones = ({ route, navigation }) => {
     }
   };
   
-
+  //  hola
   // Función para enviar imagen a la API de Gradio para recortar el fondo
   const removeBackgroundWithGradio = async (prompt) => {
     try {
