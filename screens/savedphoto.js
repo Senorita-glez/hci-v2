@@ -64,46 +64,39 @@ const PantallaAcciones = ({ route, navigation }) => {
     try {
       setLoading(true);
   
+      console.log("Preparando la imagen en base64...");
       const imageBase64 = await FileSystem.readAsStringAsync(selectedImage, {
         encoding: FileSystem.EncodingType.Base64,
       });
   
-      const body = JSON.stringify({
-        img: imageBase64,
-        prompt: prompt,
-      });
+      const body = JSON.stringify({ img: imageBase64, prompt: prompt });
+      console.log("Enviando solicitud al servidor con datos:", { prompt, img: imageBase64.slice(0, 20) + "..." });
   
-      // Cambia "localhost" por la IP de tu máquina
-      const response = await fetch('http://192.168.1.78:3000/cut-object', {
+      const response = await fetch('http://192.168.1.100:3000/cut-object', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: body,
       });
   
-      // Verificar si la respuesta es JSON antes de intentar parsearla
+      console.log("Esperando respuesta del servidor...");
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         const result = await response.json();
-        if (result) {
-          console.log('Recorte de fondo exitoso:', result);
-          Alert.alert('Éxito', 'El fondo ha sido eliminado correctamente.');
-        } else {
-          Alert.alert('Error', 'No se pudo procesar el recorte de fondo.');
-        }
+        console.log("Respuesta recibida:", result);
+        Alert.alert('Éxito', 'El fondo ha sido eliminado correctamente.');
       } else {
-        const responseText = await response.text();  // Capturar el texto de la respuesta si no es JSON
-        console.error('Respuesta no válida (no es JSON): ', responseText);
+        const responseText = await response.text();
+        console.error("Respuesta no válida (no es JSON):", responseText);
         Alert.alert('Error', 'El servidor devolvió un error inesperado.');
       }
     } catch (error) {
-      console.error('Error al enviar imagen a Gradio:', error);
-      Alert.alert('Error', 'Hubo un error al recortar el fondo.');
+      console.error("Error al enviar imagen a Gradio:", error);
+      Alert.alert("Error", "Hubo un error al recortar el fondo.");
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleRemoveBackground = async () => {
     const objectDetected = await sendImageToHuggingFace();
