@@ -28,7 +28,7 @@ function HomeScreen({ navigation }) {
     {
       id: '3',
       question: 'Is React Native cross-platform?',
-      answer: 'Yes, you can build both iOS and Android apps with React Native.',
+      answer: 'Yes, you can build both iOS and Android apps with React Native!',
     },
   ];
 
