@@ -1,9 +1,8 @@
 // screens/PantallaAcciones.js
 import React, { useState } from 'react';
-import { View, Image, StyleSheet, Text, TouchableOpacity, Alert, ActivityIndicator, Clipboard } from 'react-native';
+import { View, Image, StyleSheet, Text, TouchableOpacity, Alert, Clipboard } from 'react-native';
 import { ThemedButton } from 'react-native-really-awesome-button';
 import * as FileSystem from 'expo-file-system';
-import { HfInference } from "@huggingface/inference"
 
 const API_URL_HUGGINGFACE = "https://api-inference.huggingface.co/models/WinKawaks/vit-tiny-patch16-224";
 const HUGGINGFACE_TOKEN = "Bearer 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";
@@ -77,9 +76,6 @@ const PantallaAcciones = ({ route, navigation }) => {
         })
       });
   
-      console.log("Estado de la respuesta:", response.status);
-      console.log("Texto de la respuesta:", response.statusText);
-  
       if (!response.ok) {
         const errorText = await response.text();
         console.log("Detalles del error:", errorText);
@@ -87,7 +83,6 @@ const PantallaAcciones = ({ route, navigation }) => {
       }
   
       const result = await response.json();
-      console.log("Respuesta de la API:", result);
   
       // Accede correctamente al texto generado y elimina el prompt
       let generatedText = result[0]?.generated_text || "No se generó texto.";
