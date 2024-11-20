@@ -81,42 +81,12 @@ export default function App() {
             }}
           />
           <Tab.Screen
-            name="Maybe"
-            component={TaskList}
-            options={{
-              tabBarLabel: 'Prompt',
-              tabBarIcon: ({ color }) => (
-                <MaterialCommunityIcons name="format-quote-close" color={color} size={26} />
-              ),
-            }}
-          />
-          <Tab.Screen
             name="Cam"
             component={Pantalla1}
             options={{
               tabBarLabel: null,
               tabBarIcon: ({ color }) => (
                 <MaterialCommunityIcons name="camera" color={color} size={26} />
-              ),
-            }}
-          />
-          <Tab.Screen
-            name="Inspire you"
-            component={Principal}
-            options={{
-              tabBarLabel: 'Inspire',
-              tabBarIcon: ({ color }) => (
-                <MaterialCommunityIcons name="lightbulb-on-outline" color={color} size={26} />
-              ),
-            }}
-          />
-          <Tab.Screen
-            name="Your creations"
-            component={UserProfile}
-            options={{
-              tabBarLabel: 'Yours',
-              tabBarIcon: ({ color }) => (
-                <MaterialCommunityIcons name="account" color={color} size={26} />
               ),
             }}
           />

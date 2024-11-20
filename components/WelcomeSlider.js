@@ -23,12 +23,6 @@ const WelcomeSlider = ({ onFinish }) => {
       text: 'Utiliza nuestra cámara para capturar imágenes y explorar funciones creativas.',
       icon: 'camera-outline', // Icono de cámara
     },
-    {
-      key: 'screen4',
-      title: 'Perfil del Usuario',
-      text: 'Administra tu información personal y tus productos favoritos.',
-      icon: 'account-circle-outline', // Icono de perfil
-    },
   ];
 
   // Renderizado de cada slide
