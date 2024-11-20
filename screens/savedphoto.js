@@ -5,7 +5,7 @@ import * as FileSystem from 'expo-file-system';
 import { Ionicons } from '@expo/vector-icons';
 import * as MediaLibrary from 'expo-media-library';
 
-const BACKEND_URL = "http://192.168.1.78:5000/process_image";
+const BACKEND_URL = "http://192.168.1.86:5000/process_image";
 const API_URL_HUGGINGFACE = "https://api-inference.huggingface.co/models/WinKawaks/vit-tiny-patch16-224";
 const HUGGINGFACE_TOKEN = "Bearer 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";
 
