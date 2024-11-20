@@ -17,18 +17,18 @@ function HomeScreen({ navigation }) {
   const faqData = [
     {
       id: '1',
-      question: 'What is React Native?',
-      answer: 'React Native is a framework for building mobile apps using React and JavaScript.',
+      question: '¿Porqué la app no detecta mi objeto?',
+      answer: 'Nuestro sistema cuenta con una detección de una cantidad de objetos, el que no se reconozca se puede deber a que no se ve claramente el objeto o no esta en nuestra bd. Intenta tomar una foto nuevamente del producto',
     },
     {
       id: '2',
-      question: 'How does React Native work?',
-      answer: 'React Native uses native components to render mobile UI and logic.',
+      question: '¿Como puedo utilizar la imagen sin fondo?',
+      answer: 'Después de quitar el fondo de la imagen, puedes guardarla en tu galería para compartirla en redes sociales o bien, crear agregarla a uno de tus diseños',
     },
     {
       id: '3',
-      question: 'Is React Native cross-platform?',
-      answer: 'Yes, you can build both iOS and Android apps with React Native!',
+      question: '¿Qué pasa si algo falla en la app?',
+      answer: 'Si algo falla, puedes contactar a soporte técnico para obtener ayuda. Solo escribenos un email y lo resolveremos lo más pronto posible.',
     },
   ];
 
@@ -76,7 +76,7 @@ function HomeScreen({ navigation }) {
           <Text style={styles.avatar}>HCI</Text>
         </View>
         <View style={styles.nameContainer}>
-          <Text style={styles.name}>nuestros nombres jiji</Text>
+          <Text style={styles.name}>Miguel, Daphne y Alejandro</Text>
         </View>
         <View style={styles.infoContainer}>
           <Text style={styles.infoLabel}>Email:</Text>
@@ -84,15 +84,11 @@ function HomeScreen({ navigation }) {
         </View>
         <View style={styles.infoContainer}>
           <Text style={styles.infoLabel}>Location:</Text>
-          <Text style={styles.infoText}>Tlaxvala, México</Text>
+          <Text style={styles.infoText}>Tlaxcala, México</Text>
         </View>
         <View style={styles.infoContainer}>
           <Text style={styles.infoLabel}>Bio:</Text>
-          <Text style={styles.infoText}>Estudiantes dormidoss</Text>
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.infoLabel}>Portfolio:</Text>
-          <Text style={styles.infoText}>https://yourportfolio.com</Text>
+          <Text style={styles.infoText}>Estudiantes de Ing. en IA de la UPIIT</Text>
         </View>
       </View>
     </ScrollView>
