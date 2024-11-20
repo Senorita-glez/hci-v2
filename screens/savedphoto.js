@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { View, Image, StyleSheet, Text, TouchableOpacity, Alert, Clipboard} from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Alert,
+  Clipboard,
+  ScrollView,
+} from 'react-native';
 import { ThemedButton } from 'react-native-really-awesome-button';
 import * as FileSystem from 'expo-file-system';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,10 +21,10 @@ const HUGGINGFACE_TOKEN = "Bearer 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";
 const PantallaAcciones = ({ route, navigation }) => {
   const { selectedImage } = route.params;
   const [loading, setLoading] = useState(false);
-  const [generatedText, setGeneratedText] = useState(""); // Estado para guardar el texto generado
-  const [croppedImage, setCroppedImage] = useState(null); // Estado para guardar la URL de la imagen recortada
+  const [generatedText, setGeneratedText] = useState("");
+  const [croppedImage, setCroppedImage] = useState(null);
+  const [isProcessed, setIsProcessed] = useState(false); // Estado para controlar si la imagen ha sido procesada
 
-  // Función para enviar imagen a la API de Hugging Face
   const sendImageToHuggingFace = async () => {
     try {
       setLoading(true);
@@ -64,85 +73,52 @@ const PantallaAcciones = ({ route, navigation }) => {
     try {
       setLoading(true);
       const promptText = `Me puedes ayudar a crear un texto de marketing que me ayude a vender el siguiente producto: ${objectDetected}`;
-      console.log("Generando texto con prompt:", promptText);
-  
       const response = await fetch("https://api-inference.huggingface.co/models/microsoft/Phi-3.5-mini-instruct", {
         method: "POST",
         headers: {
-          "Authorization": HUGGINGFACE_TOKEN,
-          "Content-Type": "application/json"
+          Authorization: HUGGINGFACE_TOKEN,
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          inputs: promptText,
-          parameters: { max_tokens: 100 }
-        })
+        body: JSON.stringify({ inputs: promptText, parameters: { max_tokens: 100 } }),
       });
-  
+
       if (!response.ok) {
-        const errorText = await response.text();
-        console.log("Detalles del error:", errorText);
-        throw new Error("Error al generar el texto: " + errorText);
+        throw new Error("Error al generar el texto.");
       }
-  
+
       const result = await response.json();
-  
-      // Accede correctamente al texto generado y elimina el prompt
-      let generatedText = result[0]?.generated_text || "No se generó texto.";
-      generatedText = generatedText.replace(promptText, "").trim(); // Elimina el prompt del texto
-  
-      if (generatedText.includes(".")) {
-        generatedText = generatedText.split(".")[0] + ".";
-      }
-  
-      setGeneratedText(generatedText); // Guarda el texto generado en el estado para mostrarlo en la aplicación
-      console.log("Texto final generado:", generatedText);
+      let text = result[0]?.generated_text || "No se generó texto.";
+      text = text.replace(promptText, "").trim();
+      if (text.includes(".")) text = text.split(".")[0] + ".";
+      setGeneratedText(text);
     } catch (error) {
-      console.error("Error al generar texto:", error);
       Alert.alert("Error", error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Función para recortar la imagen usando el backend
   const cropImage = async (objectDetected) => {
     try {
       setLoading(true);
-      console.log("Convirtiendo la imagen seleccionada a Base64...");
-
-      // Leer la imagen seleccionada como Base64
       const imageBase64 = await FileSystem.readAsStringAsync(selectedImage, {
-        encoding: FileSystem.EncodingType.Base64
+        encoding: FileSystem.EncodingType.Base64,
       });
-
-      console.log("Enviando la imagen al backend para recorte...");
 
       const response = await fetch(BACKEND_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          img_base64: imageBase64, // Imagen codificada en Base64
-          prompt: objectDetected, // Objeto detectado
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ img_base64: imageBase64, prompt: objectDetected }),
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.log("Detalles del error del backend:", errorText);
-        throw new Error("Error al recortar la imagen: " + errorText);
+        throw new Error("Error al recortar la imagen.");
       }
 
       const result = await response.json();
-      console.log("Respuesta del backend:", result);
-
-      // Extrae la URL de la imagen recortada
-      const croppedImageUrl = result.cropped_image_url;
-      setCroppedImage(croppedImageUrl); // Actualiza el estado con la imagen recortada
-      console.log("URL de la imagen recortada:", croppedImageUrl);
+      setCroppedImage(result.cropped_image_url);
+      setIsProcessed(true); // Marca la imagen como procesada
     } catch (error) {
-      console.error("Error al recortar la imagen:", error);
       Alert.alert("Error", error.message);
     } finally {
       setLoading(false);
@@ -153,114 +129,122 @@ const PantallaAcciones = ({ route, navigation }) => {
     const objectDetected = await sendImageToHuggingFace();
     if (objectDetected) {
       await cropImage(objectDetected);
-      await generateMarketingText(objectDetected); // Asegura que se genere el texto
+      await generateMarketingText(objectDetected);
     }
   };
 
-  // Descarga la imagen recortada y guárdala en la carpeta de Descargas
   const handleDownloadImage = async () => {
     try {
       if (!croppedImage) {
-        Alert.alert("Error", "No hay imagen recortada para descargar.");
-        return;
+        throw new Error("No hay imagen recortada para descargar.");
       }
 
-      // Solicita permisos para acceder al almacenamiento
       const { granted } = await MediaLibrary.requestPermissionsAsync();
       if (!granted) {
-        Alert.alert("Permiso denegado", "Se necesitan permisos para guardar en la carpeta de Descargas.");
-        return;
+        throw new Error("Permiso denegado para guardar en la carpeta de Descargas.");
       }
 
       const fileUri = `${FileSystem.cacheDirectory}${Date.now()}_cropped.png`;
       const result = await FileSystem.downloadAsync(croppedImage, fileUri);
 
-      // Guarda el archivo en la carpeta de Descargas
       const asset = await MediaLibrary.createAssetAsync(result.uri);
-      const album = await MediaLibrary.getAlbumAsync('Download');
-      if (album == null) {
-        await MediaLibrary.createAlbumAsync('Download', asset, false);
+      const album = await MediaLibrary.getAlbumAsync("Download");
+      if (!album) {
+        await MediaLibrary.createAlbumAsync("Download", asset, false);
       } else {
         await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
       }
 
       Alert.alert("Descarga exitosa", "Imagen guardada en la carpeta de Descargas.");
     } catch (error) {
-      console.error("Error al descargar la imagen:", error);
-      Alert.alert("Error", "No se pudo descargar la imagen.");
+      Alert.alert("Error", error.message);
     }
   };
 
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Foto Guardada</Text>
-      <Image
-        source={{ uri: croppedImage || selectedImage }}
-        style={styles.savedImage}
-        resizeMode="contain"
-      />
-      {loading ? (
-        <Text style={styles.loadingText}>Procesando, por favor espera...</Text>
-      ) : (
-        <>
-          <ThemedButton
-            name="rick"
-            type="primary"
-            activityColor="#349890"
-            height={50}
-            width={200}
-            style={styles.bttn}
-            raiseLevel={10}
-            borderWidth={5}
-            borderColor="#349890"
-            backgroundDarker="#67cbc3"
-            backgroundColor="#1c1c1c"
-            onPress={handleCropImage}
-          >
-            <Text style={styles.buttonText}>Recortar Imagen</Text>
-          </ThemedButton>
-          {croppedImage && (
-            <>
-              <TouchableOpacity onPress={handleDownloadImage} style={styles.downloadButton}>
-                <Ionicons name="download" size={24} color="white" />
-              </TouchableOpacity>
-              <Text style={styles.generatedText}>{generatedText || "Generando texto..."}</Text>
-              <TouchableOpacity
-                onPress={() => Clipboard.setString(generatedText)}
-                style={styles.copyButton}
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Foto Guardada</Text>
+        <Image
+          source={{ uri: croppedImage || selectedImage }}
+          style={styles.savedImage}
+          resizeMode="contain"
+        />
+        {loading ? (
+          <Text style={styles.loadingText}>Procesando, por favor espera...</Text>
+        ) : (
+          <>
+            {!isProcessed && ( // Oculta el botón después de que la imagen ha sido procesada
+              <ThemedButton
+                name="rick"
+                type="primary"
+                activityColor="#349890"
+                height={50}
+                width={200}
+                style={styles.bttn}
+                raiseLevel={10}
+                borderWidth={5}
+                borderColor="#349890"
+                backgroundDarker="#67cbc3"
+                backgroundColor="#1c1c1c"
+                onPress={handleCropImage}
               >
-                <Text style={styles.buttonText}>Copiar Texto</Text>
-              </TouchableOpacity>
-            </>
-          )}
-        </>
-      )}
-      <TouchableOpacity style={styles.btnnobtn} onPress={() => navigation.navigate("Home")}>
-        <Text style={styles.btnnobtnText}>Volver al inicio</Text>
-      </TouchableOpacity>
-    </View>
+                <Text style={styles.buttonText}>Recortar Imagen</Text>
+              </ThemedButton>
+            )}
+            {croppedImage && (
+              <>
+                <TouchableOpacity onPress={handleDownloadImage} style={styles.downloadButton}>
+                  <Ionicons name="download" size={24} color="white" />
+                </TouchableOpacity>
+                <Text style={styles.generatedText}>{generatedText}</Text>
+                <TouchableOpacity
+                  onPress={() => Clipboard.setString(generatedText)}
+                  style={styles.copyButton}
+                >
+                  <Text style={styles.buttonText}>Copiar Texto</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </>
+        )}
+        <TouchableOpacity
+          style={styles.btnnobtn}
+          onPress={() => navigation.navigate("Home")}
+        >
+          <Text style={styles.btnnobtnText}>Volver al inicio</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
 export default PantallaAcciones;
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 20,
+    paddingTop: 60,
+    backgroundColor: "#1c1c1c",
+  },
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#1c1c1c",
+    padding: 20,
   },
   title: {
     fontSize: 27,
     fontWeight: "600",
     marginBottom: 10,
     color: "#969696",
+    textAlign: "center",
   },
   savedImage: {
-    width: "90%",
-    height: "50%",
+    width: "100%",
+    height: 400,
     marginBottom: 20,
   },
   loadingText: {
@@ -269,27 +253,13 @@ const styles = StyleSheet.create({
     margin: 20,
     textAlign: "center",
   },
-  btnnobtn: {
-    backgroundColor: "transparent",
-    padding: 0,
-    marginTop: 25,
-    textDecorationLine: "underline",
-  },
-  btnnobtnText: {
-    color: "#424242",
-    fontSize: 16,
-    fontWeight: "bold",
+  bttn: {
+    marginBottom: 20,
   },
   buttonText: {
     color: "#ffffff",
     fontSize: 16,
     fontWeight: "bold",
-  },
-  copyButton: {
-    backgroundColor: "#349890",
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 10,
   },
   downloadButton: {
     backgroundColor: "#349890",
@@ -304,5 +274,20 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     margin: 20,
     textAlign: "center",
+  },
+  copyButton: {
+    backgroundColor: "#349890",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  btnnobtn: {
+    marginTop: 25,
+  },
+  btnnobtnText: {
+    color: "#424242",
+    fontSize: 16,
+    fontWeight: "bold",
+    textDecorationLine: "underline",
   },
 });
