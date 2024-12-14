@@ -14,7 +14,8 @@ import * as FileSystem from 'expo-file-system';
 import { Ionicons } from '@expo/vector-icons';
 import * as MediaLibrary from 'expo-media-library';
 
-const BACKEND_URL = "http://192.168.1.86:5000/process_image";
+const BACKEND_URL = "http://192.168.1.3:5000/process_image";
+
 const API_URL_HUGGINGFACE = "https://api-inference.huggingface.co/models/WinKawaks/vit-tiny-patch16-224";
 const HUGGINGFACE_TOKEN = "Bearer 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";
 
@@ -23,24 +24,22 @@ const PantallaAcciones = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false);
   const [generatedText, setGeneratedText] = useState("");
   const [croppedImage, setCroppedImage] = useState(null);
-  const [isProcessed, setIsProcessed] = useState(false); // Estado para controlar si la imagen ha sido procesada
+  const [isProcessed, setIsProcessed] = useState(false);
 
   const sendImageToHuggingFace = async () => {
     try {
       setLoading(true);
-
-      // Leer la imagen como base64
       const imageBlob = await FileSystem.readAsStringAsync(selectedImage, {
-        encoding: FileSystem.EncodingType.Base64
+        encoding: FileSystem.EncodingType.Base64,
       });
 
       const response = await fetch(API_URL_HUGGINGFACE, {
         method: "POST",
         headers: {
           Authorization: HUGGINGFACE_TOKEN,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ inputs: imageBlob })
+        body: JSON.stringify({ inputs: imageBlob }),
       });
 
       if (!response.ok) {
@@ -53,7 +52,7 @@ const PantallaAcciones = ({ route, navigation }) => {
 
       if (result && result.length > 0 && result[0].label) {
         const bestObject = result[0].label;
-        console.log("Objeto detectado:", bestObject); // Registro del objeto detectado
+        console.log("Objeto detectado:", bestObject);
         return bestObject;
       } else {
         console.log("Respuesta inesperada de Hugging Face:", result);
@@ -69,25 +68,28 @@ const PantallaAcciones = ({ route, navigation }) => {
     }
   };
 
-  const generateMarketingText = async (objectDetected) => {
+  const generateObjectDescription = async (objectDetected) => {
     try {
       setLoading(true);
-      const promptText = `Me puedes ayudar a crear un texto de marketing que me ayude a vender el siguiente producto: ${objectDetected}`;
-      const response = await fetch("https://api-inference.huggingface.co/models/microsoft/Phi-3.5-mini-instruct", {
-        method: "POST",
-        headers: {
-          Authorization: HUGGINGFACE_TOKEN,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ inputs: promptText, parameters: { max_tokens: 100 } }),
-      });
+      const promptText = `Describe detalladamente el siguiente objeto: ${objectDetected}`;
+      const response = await fetch(
+        "https://api-inference.huggingface.co/models/microsoft/Phi-3.5-mini-instruct",
+        {
+          method: "POST",
+          headers: {
+            Authorization: HUGGINGFACE_TOKEN,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ inputs: promptText, parameters: { max_tokens: 100 } }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error("Error al generar el texto.");
+        throw new Error("Error al generar la descripción.");
       }
 
       const result = await response.json();
-      let text = result[0]?.generated_text || "No se generó texto.";
+      let text = result[0]?.generated_text || "No se generó una descripción.";
       text = text.replace(promptText, "").trim();
       if (text.includes(".")) text = text.split(".")[0] + ".";
       setGeneratedText(text);
@@ -117,7 +119,7 @@ const PantallaAcciones = ({ route, navigation }) => {
 
       const result = await response.json();
       setCroppedImage(result.cropped_image_url);
-      setIsProcessed(true); // Marca la imagen como procesada
+      setIsProcessed(true);
     } catch (error) {
       Alert.alert("Error", error.message);
     } finally {
@@ -129,7 +131,7 @@ const PantallaAcciones = ({ route, navigation }) => {
     const objectDetected = await sendImageToHuggingFace();
     if (objectDetected) {
       await cropImage(objectDetected);
-      await generateMarketingText(objectDetected);
+      await generateObjectDescription(objectDetected);
     }
   };
 
@@ -174,7 +176,7 @@ const PantallaAcciones = ({ route, navigation }) => {
           <Text style={styles.loadingText}>Procesando, por favor espera...</Text>
         ) : (
           <>
-            {!isProcessed && ( // Oculta el botón después de que la imagen ha sido procesada
+            {!isProcessed && (
               <ThemedButton
                 name="rick"
                 type="primary"
